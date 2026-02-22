@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="An AWESOME CI/CD learning demo deployed via GitHub Actions and Cloudflare Pages." />
+    <meta name="description"
+        content="An AWESOME CI/CD learning demo deployed via GitHub Actions and Cloudflare Pages." />
     <title>CI/CD Demo 🚀</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -70,6 +71,17 @@
             <div class="meta-item">
                 <span class="meta-label">Hosted on</span>
                 <span class="meta-value">Cloudflare Pages</span>
+            </div>
+        </div>
+
+        <!-- Deployment history — populated by app.js fetching from Supabase -->
+        <div class="deploys-section">
+            <h2 class="deploys-title">
+                <span class="deploys-dot"></span>
+                Recent Deployments
+            </h2>
+            <div id="deployments-list" class="deploys-list">
+                <p class="deploy-empty">Loading deployment history…</p>
             </div>
         </div>
     </main>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A simple CI/CD learning demo deployed via GitHub Actions and Cloudflare Pages." />
+    <title>CI/CD Demo 🚀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+
+    <header>
+        <div class="badge">🔁 CI/CD Learning Project</div>
+        <h1>Hello from <span class="highlight">DEV</span></h1>
+        <p class="subtitle">This page was deployed automatically by a GitHub Actions pipeline.</p>
+    </header>
+
+    <main>
+        <section class="cards">
+
+            <div class="card">
+                <div class="card-icon">📝</div>
+                <h2>Step 1</h2>
+                <h3>Build Locally</h3>
+                <p>Write your code on your laptop in a local sandbox environment.</p>
+                <div class="status done">✓ Done</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🐙</div>
+                <h2>Step 2</h2>
+                <h3>Push to GitHub</h3>
+                <p>Commit and push your code to a GitHub repository to trigger a workflow.</p>
+                <div class="status done">✓ Done</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚙️</div>
+                <h2>Step 3</h2>
+                <h3>GitHub Actions</h3>
+                <p>A CI/CD pipeline automatically picks up your push and runs the deployment.</p>
+                <div class="status done">✓ Done</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">☁️</div>
+                <h2>Step 4</h2>
+                <h3>Live on Cloudflare</h3>
+                <p>Your code is deployed to a Cloudflare Pages DEV environment. You're here!</p>
+                <div class="status done">✓ Done</div>
+            </div>
+
+        </section>
+
+        <div class="meta-box">
+            <div class="meta-item">
+                <span class="meta-label">Environment</span>
+                <span class="meta-value env">DEV</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Deployed by</span>
+                <span class="meta-value">GitHub Actions</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Hosted on</span>
+                <span class="meta-value">Cloudflare Pages</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Built step-by-step as a CI/CD learning exercise 🎓</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

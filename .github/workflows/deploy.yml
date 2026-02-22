@@ -2,58 +2,69 @@
 # deploy.yml  —  CI/CD pipeline for cicd-demo
 #
 # WHAT THIS DOES:
-#   Every time you push code to the "main" branch, GitHub automatically runs
-#   this workflow. It checks out your code and deploys it to Cloudflare Pages.
+#   Every time you push code to the "main" branch, this workflow:
+#     1. Checks out your code onto a fresh GitHub-hosted virtual machine
+#     2. Installs Wrangler (Cloudflare's CLI tool)
+#     3. Creates the Cloudflare Pages project if it doesn't exist yet
+#     4. Deploys all your files to Cloudflare Pages DEV
 #
 # KEY CONCEPTS:
 #   - "workflow"  = the whole automation file (this file)
 #   - "job"       = a group of steps that run on one virtual machine
 #   - "step"      = one individual task inside a job
-#   - "action"    = a pre-built, reusable step from the GitHub marketplace
+#   - "run:"      = run a raw shell command on the VM
+#   - "env:"      = environment variables passed into a step
 #   - "secret"    = an encrypted variable stored in GitHub (never visible in logs)
 # ─────────────────────────────────────────────────────────────────────────────
 
 name: Deploy to Cloudflare Pages (DEV)
 
 # ── TRIGGER ──────────────────────────────────────────────────────────────────
-# This section says WHEN to run the workflow.
-# "push" means: run this whenever someone pushes commits.
-# "branches: [main]" means: only care about pushes to the "main" branch.
+# Run this workflow whenever there's a push to the "main" branch.
 on:
     push:
         branches:
             - main
 
 # ── JOBS ─────────────────────────────────────────────────────────────────────
-# A workflow can have multiple jobs. Ours has just one: "deploy".
 jobs:
     deploy:
         name: Deploy
-        # This means: spin up a fresh Ubuntu Linux virtual machine to run our steps.
+        # Spin up a fresh Ubuntu Linux virtual machine for this job.
         runs-on: ubuntu-latest
 
-        # ── STEPS ──────────────────────────────────────────────────────────────
-        # Steps run in order, top to bottom. If any step fails, the job stops.
+        # ── STEPS ────────────────────────────────────────────────────────────────
         steps:
             # STEP 1: Checkout
-            # "actions/checkout" is an official GitHub Action that clones your repo
-            # onto the virtual machine so the next steps can see your files.
+            # Clones your GitHub repo onto the virtual machine so the next steps
+            # can see your files (index.html, style.css, app.js, etc.)
             - name: Checkout code
               uses: actions/checkout@v4
 
-            # STEP 2: Deploy to Cloudflare Pages
-            # "cloudflare/wrangler-action" is Cloudflare's official GitHub Action.
-            # It installs wrangler (Cloudflare's CLI tool) and runs a deploy command.
-            #
-            # "secrets.*" pulls in the encrypted values you saved in GitHub Settings.
-            # They are NEVER printed in logs — GitHub automatically redacts them.
+            # STEP 2: Install Wrangler
+            # Wrangler is Cloudflare's command-line tool. We install it globally
+            # on the VM using npm (Node's package manager).
+            - name: Install Wrangler
+              run: npm install -g wrangler
+
+            # STEP 3: Create Cloudflare Pages project (if it doesn't exist yet)
+            # This runs "wrangler pages project create" to set up the project.
+            # The "|| true" at the end means: "if this command fails (e.g. because
+            # the project already exists), that's fine — keep going anyway."
+            # Without "|| true", a failure here would stop the whole workflow.
+            - name: Create Pages project (first time only)
+              run: wrangler pages project create cicd-demo --production-branch=main || true
+              env:
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+            # STEP 4: Deploy to Cloudflare Pages
+            # This uploads all files in "." (the current directory) to Cloudflare Pages.
+            # --project-name  tells wrangler which Pages project to deploy to
+            # --branch=main   tells Cloudflare this is the production branch
+            # --commit-dirty  suppresses a git warning about uncommitted changes on the VM
             - name: Deploy to Cloudflare Pages
-              uses: cloudflare/wrangler-action@v3
-              with:
-                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  # "wrangler pages deploy" uploads the files to Cloudflare Pages.
-                  # "."  means "deploy everything in the current directory"
-                  # "--project-name" tells Cloudflare which Pages project to deploy to
-                  # "--branch=main" tells Cloudflare this is the production (DEV) branch
-                  command: pages deploy . --project-name=cicd-demo --branch=main
+              run: wrangler pages deploy . --project-name=cicd-demo --branch=main --commit-dirty=true
+              env:
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
